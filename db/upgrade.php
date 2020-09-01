@@ -31,7 +31,8 @@ defined('MOODLE_INTERNAL') || die();
  * @param int $oldversion
  * @return bool
  */
-function xmldb_gerautog_upgrade($oldversion) {
+function xmldb_gerautog_upgrade($oldversion)
+{
     global $DB;
 
     $dbman = $DB->get_manager();

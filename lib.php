@@ -30,7 +30,8 @@ defined('MOODLE_INTERNAL') || die();
  * @param string $feature Constant representing the feature.
  * @return true | null True if the feature is supported, null otherwise.
  */
-function gerautog_supports($feature) {
+function gerautog_supports($feature)
+{
     switch ($feature) {
         case FEATURE_MOD_INTRO:
             return true;
@@ -50,7 +51,8 @@ function gerautog_supports($feature) {
  * @param mod_gerautog_mod_form $mform The form.
  * @return int The id of the newly inserted record.
  */
-function gerautog_add_instance($moduleinstance, $mform = null) {
+function gerautog_add_instance($moduleinstance, $mform = null)
+{
     global $DB;
 
     $moduleinstance->timecreated = time();
@@ -70,7 +72,8 @@ function gerautog_add_instance($moduleinstance, $mform = null) {
  * @param mod_gerautog_mod_form $mform The form.
  * @return bool True if successful, false otherwise.
  */
-function gerautog_update_instance($moduleinstance, $mform = null) {
+function gerautog_update_instance($moduleinstance, $mform = null)
+{
     global $DB;
 
     $moduleinstance->timemodified = time();
@@ -85,7 +88,8 @@ function gerautog_update_instance($moduleinstance, $mform = null) {
  * @param int $id Id of the module instance.
  * @return bool True if successful, false on failure.
  */
-function gerautog_delete_instance($id) {
+function gerautog_delete_instance($id)
+{
     global $DB;
 
     $exists = $DB->get_record('gerautog', array('id' => $id));

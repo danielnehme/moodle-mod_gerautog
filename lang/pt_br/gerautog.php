@@ -25,4 +25,39 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Gerador de autógrafos';
+// Form Sections.
+$string['pluginname'] = 'Gerador de Autógrafos';
+$string['modulename'] = 'Gerador de Autógrafos';
+$string['modulenameplural'] = 'Geradores de Autógrafos';
+$string['gerautogname'] = 'Nome';
+$string['gerautogname_help'] = 'Nome da atividade';
+$string['setting_fileupload'] = 'Selecione um arquivo pdf';
+$string['setting_fileupload_help'] = "Podes trocar o arquivo selecionado até clicar o botão Salvar.";
+
+$string['pluginadministration'] = 'Administração do Gerador de Autógrafos';
+
+$string['issueoptions'] = 'Opções de Emissão';
+$string['emailauthors'] = 'Enviar email para os Professores';
+$string['emailothers'] = 'Enviar email para outros';
+$string['emailfrom'] = 'Nome alternativo do remetente do email';
+$string['delivery'] = 'Envio';
+
+$string['emailauthors_help'] = 'Quando habilitado, os professores recebem os emails toda vez que um aluno emitir um certificado.';
+$string['emailothers_help'] = 'Digite os endereços de emails que vão receber o alerta de emissão de certificado.';
+$string['emailfrom_help'] = 'Nome a ser usado como remetente dos email enviados';
+$string['delivery_help'] = 'Escolha como o certificado deve ser entregue aos alunos:<br>
+<ul>
+<li>Visualizar em uma nova janela: Abre uma nova janela no navegador do aluno contendo o certificado.</li>
+<li>Forçar o download: Abre uma janela de download de arquivo para o aluno salvar em seu computador.</li>
+<li>por Email: Envia o certificado para o email do aluno, e abre o certificado em uma nova janela do navegador.</li>
+</ul><p>
+Depois que estudante emite seu certificado, se ele clicar na atividade certificado aparecerá a data de emissão do certificado e ele poderá revisar ocertificado emitido</p>';
+
+// Delivery options.
+$string['openbrowser'] = 'Visualizar em uma nova janela';
+$string['download'] = 'Forçar o download';
+$string['emailbook'] = 'Enviar por Email';
+$string['nodelivering'] = 'Sem envio, o usuário vai receber o livro por outros meios';
+$string['emailoncompletion'] = 'Enviar na conclusão do curso';
+
+//$string['gerautogfieldset'] = '';

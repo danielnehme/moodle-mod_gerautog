@@ -25,4 +25,41 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Gerador de autógrafos';
+$string['pluginname'] = 'Autograph Generator';
+$string['modulename'] = 'Autograph Generator';
+$string['modulenameplural'] = 'Autographs Generators';
+$string['gerautogname'] = 'Name';
+$string['gerautogname_help'] = 'Activity name';
+$string['setting_fileupload'] = 'Select a pdf file';
+$string['setting_fileupload_help'] = "You can only change the selected file until the annotator has been created by a click on 'Save'.";
+
+$string['pluginadministration'] = 'Autograph Generator administration';
+
+// Form Sections.
+$string['issueoptions'] = 'Issue Options';
+$string['emailauthors'] = 'Email Teachers';
+$string['emailothers'] = 'Email Others';
+$string['emailfrom'] = 'Email From name';
+$string['delivery'] = 'Delivery';
+
+$string['emailauthors_help'] = 'If enabled, then teachers are alerted with an email whenever students receive a certificate.';
+$string['emailothers_help'] = 'Enter the email addresses here, separated by a comma, of those who should be alerted with an email whenever students receive a certificate.';
+$string['emailfrom_help'] = 'Alternate email form name';
+$string['delivery_help'] = 'Choose here how you would like your students to get their certificate.
+<ul>
+<li>Open in Browser: Opens the certificate in a new browser window.</li>
+<li>Force Download: Opens the browser file download window.</li>
+<li>Email Certificate: Choosing this option sends the certificate to the student as an email attachment.</li>
+<li>After a user receives their certificate, if they click on the certificate link from the course homepage, they will see the date they received their certificate and will be able to review their received certificate.</li>
+</ul>';
+
+// Delivery options.
+$string['openbrowser'] = 'Open in new window';
+$string['download'] = 'Force download';
+$string['emailbook'] = 'Email';
+$string['nodelivering'] = 'No delivering, user will receive this certificate using others ways';
+$string['emailoncompletion'] = 'Email on course completion';
+
+
+
+//$string['gerautogfieldset'] = '';
