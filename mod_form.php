@@ -89,8 +89,9 @@ class mod_gerautog_mod_form extends moodleform_mod
         $filemanageroptions['return_types'] = FILE_INTERNAL | FILE_EXTERNAL;
         */
 
-        $mform->addElement('filemanager', 'files', get_string('setting_fileupload', 'mod_gerautog'), null, $this->get_filemanager_options_array()); // Params: 1. type of the element, 2. (html) elementname, 3. label.
-        $mform->addHelpButton('files', 'setting_fileupload', 'mod_gerautog');
+        $mform->addElement('filemanager', 'arqs', get_string('setting_fileupload', 'mod_gerautog'), null, $this->get_filemanager_options_array()); // Params: 1. type of the element, 2. (html) elementname, 3. label.
+        $mform->addHelpButton('arqs', 'setting_fileupload', 'mod_gerautog');
+
 
         // Issue options.
 
@@ -142,10 +143,10 @@ class mod_gerautog_mod_form extends moodleform_mod
     public function data_preprocessing(&$defaultvalues) {
         if ($this->current->instance) {
             $contextid = $this->context->id;
-            $draftitemid = file_get_submitted_draft_itemid('files');
-            file_prepare_draft_area($draftitemid, $contextid, 'mod_pdfannotator', 'content', $entry->id, $this->get_filemanager_options_array());
-            $defaultvalues['files'] = $draftitemid;
-            $this->_form->disabledIf('files', 'update', 'notchecked', 2);
+            $draftitemid = file_get_submitted_draft_itemid('arqs');
+            file_prepare_draft_area($draftitemid, $contextid, 'mod_pdfannotator', 'content', 1, $this->get_filemanager_options_array());
+            $defaultvalues['arqs'] = $draftitemid;
+            //$this->_form->disabledIf('arqs', 'update', 'notchecked', 2);
         }
     }
 
@@ -154,7 +155,7 @@ class mod_gerautog_mod_form extends moodleform_mod
         global $COURSE;
 
         return array('subdirs' => true, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 1,
-                'accepted_types' => array('.mod_pdfannotator'));
+                'accepted_types' => array('.pdf'));
     }
 
 
@@ -166,12 +167,17 @@ class mod_gerautog_mod_form extends moodleform_mod
 
         $usercontext = context_user::instance($USER->id);
         $fs = get_file_storage();
-        if (!$files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data['files'], 'sortorder, id', false)) {
-            $errors['files'] = get_string('required');
+        if (!$files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data['arqs'], 'sortorder, id', false)) {
+            $errors['arqs'] = get_string('required');
             return $errors;
         }
         if (count($files) == 1) {
             // No need to select main file if only one picked.
+
+            // Save file
+            file_save_draft_area_files($data['arqs'], $this->context->id, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
+
+
             return $errors;
         } else if (count($files) > 1) {
             $mainfile = false;
