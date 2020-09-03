@@ -37,7 +37,7 @@ $string['pluginadministration'] = 'Autograph Generator administration';
 
 // Form Sections.
 $string['issueoptions'] = 'Issue Options';
-$string['emailauthors'] = 'Email Authors';
+$string['emailauthors'] = 'Email Author';
 $string['emailothers'] = 'Email Others';
 $string['emailfrom'] = 'Email From name';
 $string['delivery'] = 'Delivery';

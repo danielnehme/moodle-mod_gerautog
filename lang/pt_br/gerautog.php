@@ -37,7 +37,7 @@ $string['setting_fileupload_help'] = "Podes trocar o arquivo selecionado até cl
 $string['pluginadministration'] = 'Administração do Gerador de Autógrafos';
 
 $string['issueoptions'] = 'Opções de Emissão';
-$string['emailauthors'] = 'Enviar email para os autores';
+$string['emailauthors'] = 'Enviar email para o autore';
 $string['emailothers'] = 'Enviar email para outros';
 $string['emailfrom'] = 'Nome alternativo do remetente do email';
 $string['delivery'] = 'Envio';

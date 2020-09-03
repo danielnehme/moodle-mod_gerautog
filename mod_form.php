@@ -89,7 +89,7 @@ class mod_gerautog_mod_form extends moodleform_mod
         $filemanageroptions['return_types'] = FILE_INTERNAL | FILE_EXTERNAL;
         */
 
-        $mform->addElement('filemanager', 'arqs', get_string('setting_fileupload', 'mod_gerautog'), null, $this->get_filemanager_options_array()); // Params: 1. type of the element, 2. (html) elementname, 3. label.
+        $mform->addElement('filemanager', 'arqs', get_string('setting_fileupload', 'mod_gerautog'), null, $this->get_filemanager_options_array());
         $mform->addHelpButton('arqs', 'setting_fileupload', 'mod_gerautog');
 
 
@@ -134,21 +134,80 @@ class mod_gerautog_mod_form extends moodleform_mod
         $this->add_action_buttons();
     }
 
-    //if (empty($entry->id)) {
-    //    $entry = new stdClass;
-    //    $entry->id = null;
-    //}
 
+/*
     // Loads the old file in the filemanager.
     public function data_preprocessing(&$defaultvalues) {
         if ($this->current->instance) {
             $contextid = $this->context->id;
             $draftitemid = file_get_submitted_draft_itemid('arqs');
-            file_prepare_draft_area($draftitemid, $contextid, 'mod_pdfannotator', 'content', 1, $this->get_filemanager_options_array());
+            file_prepare_draft_area($draftitemid, $contextid, 'mod_gerautog', 'content', 1, $this->get_filemanager_options_array());
             $defaultvalues['arqs'] = $draftitemid;
             //$this->_form->disabledIf('arqs', 'update', 'notchecked', 2);
         }
     }
+*/
+
+    /**
+     * Prepares the form before data are set
+     *
+     * Additional wysiwyg editor are prepared here, the introeditor is prepared automatically by core.
+     * Grade items are set here because the core modedit supports single grade item only.
+     *
+     * @param array $data to be set
+     * @return void
+     */
+    public function data_preprocessing(&$data) {
+        global $CFG;
+        //require_once(dirname(__FILE__) . '/locallib.php');
+        parent::data_preprocessing($data);
+        if ($this->current->instance) {
+            $contextid = $this->context->id;
+            $draftitemid = file_get_submitted_draft_itemid('arqs');
+            file_prepare_draft_area($draftitemid, $contextid, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
+            $data['arqs'] = $draftitemid;
+
+            // Prepare certificate text.
+            //$data['certificatetext'] = array('text' => $data['certificatetext'], 'format' => FORMAT_HTML);
+
+        } else { // Load default.
+            //$data['certificatetext'] = array('text' => '', 'format' => FORMAT_HTML);
+        }
+
+        // Completion rules.
+        //$data['completiontimeenabled'] = !empty($data['requiredtime']) ? 1 : 0;
+
+    }
+
+
+
+    public function data_postprocessing($data) {
+
+        // File manager always creata a Files folder, so certimages is never empty.
+        // I must check if it has a file or it's only a empty files folder reference.
+        if (isset($data->arqs) && !empty($data->arqs)
+            && !$this->check_has_files('arqs')) {
+                $data->arqs = null;
+
+        }
+    }
+
+
+    private function check_has_files($itemname) {
+        global $USER;
+
+        $draftitemid = file_get_submitted_draft_itemid($itemname);
+        file_prepare_draft_area($draftitemid, $this->context->id, 'mod_gerautog', 'arqs', null,
+                                $this->get_filemanager_options_array());
+
+        // Get file from users draft area.
+        $usercontext = context_user::instance($USER->id);
+        $fs = get_file_storage();
+        $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
+
+        return (count($files) > 0);
+    }
+
 
     private function get_filemanager_options_array()
     {
@@ -158,7 +217,20 @@ class mod_gerautog_mod_form extends moodleform_mod
                 'accepted_types' => array('.pdf'));
     }
 
+    /**
+     * Some basic validation
+     *
+     * @param $data
+     * @param $files
+     * @return array
+     */
+    public function validation($data, $files) {
+        $errors = parent::validation($data, $files);
 
+
+        return $errors;
+    }
+    /*
     public function validation($data, $files)
     {
         global $USER;
@@ -173,10 +245,16 @@ class mod_gerautog_mod_form extends moodleform_mod
         }
         if (count($files) == 1) {
             // No need to select main file if only one picked.
-
+            var_dump($data);
             // Save file
-            file_save_draft_area_files($data['arqs'], $this->context->id, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
-
+            $fileinfo = array('contextid' => $this->context->id,
+                              'component' => 'mod_gerautog',
+                              'filearea' => 'arqs',
+                              'itemid' => 1,
+                              'filepath' => '/');
+            $data['arqs'] = $this->save_upload_file($data['arqs'], $fileinfo);
+            //file_save_draft_area_files($data['arqs'], $this->context->id, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
+            //var_dump($data);
 
             return $errors;
         } else if (count($files) > 1) {
@@ -194,5 +272,30 @@ class mod_gerautog_mod_form extends moodleform_mod
             }
         }
         return $errors;
+    }
+*/
+
+    /**
+     * Save upload files in $fileinfo array and return the filename
+     *
+     * @param string $formitemid Upload file form id
+     * @param array $fileinfo The file info array, where to store uploaded file
+     * @return string filename
+     */
+    private function save_upload_file($formitemid, array $fileinfo) {
+        // Clear file area.
+        if (empty($fileinfo['itemid'])) {
+            $fileinfo['itemid'] = '';
+        }
+
+        $fs = get_file_storage();
+        $fs->delete_area_files($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid']);
+        file_save_draft_area_files($formitemid, $fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'],
+                                $fileinfo['itemid']);
+        // Get only files, not directories.
+        $files = $fs->get_area_files($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid'], '',
+                                    false);
+        $file = array_shift($files);
+        return $file->get_filename();
     }
 }
