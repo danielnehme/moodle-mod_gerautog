@@ -60,4 +60,9 @@ $string['emailbook'] = 'Enviar por Email';
 $string['nodelivering'] = 'Sem envio, o usuário vai receber o livro por outros meios';
 $string['emailoncompletion'] = 'Enviar na conclusão do curso';
 
+$string['filenotfound'] = 'Arquivo não encontrado.';
+
+$string['openwindow'] = 'Clique no link abaixo para pegar seu livro.';
+$string['getbook'] = 'Ver livro';
+
 //$string['gerautogfieldset'] = '';

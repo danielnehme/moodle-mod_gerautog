@@ -60,6 +60,9 @@ $string['emailbook'] = 'Email';
 $string['nodelivering'] = 'No delivering, user will receive this certificate using others ways';
 $string['emailoncompletion'] = 'Email on course completion';
 
+$string['filenotfound'] = 'File not found';
 
+$string['openwindow'] = 'Click the link below to get your book:';
+$string['getbook'] = 'View book';
 
 //$string['gerautogfieldset'] = '';
