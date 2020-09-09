@@ -29,9 +29,7 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 /**
  * Module instance settings form.
  *
- * @package    mod_gerautog
- * @copyright  2020 Nasnuv <tecnologia@nasnuv.com.br>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author Daniel Muller
  */
 
 class mod_gerautog_mod_form extends moodleform_mod
@@ -43,7 +41,7 @@ class mod_gerautog_mod_form extends moodleform_mod
     public function definition()
     {
         global $CFG;
-
+        
         $mform = $this->_form;
 
         // Adding the "general" fieldset, where all the common settings are shown.
@@ -72,7 +70,7 @@ class mod_gerautog_mod_form extends moodleform_mod
         $mform->addElement('filemanager', 'arqs', get_string('setting_fileupload', 'mod_gerautog'), null, $this->get_filemanager_options_array());
         $mform->addHelpButton('arqs', 'setting_fileupload', 'mod_gerautog');
 
-
+/*
         // Issue options.
 
         $mform->addElement('header', 'issueoptions', get_string('issueoptions', 'mod_gerautog'));
@@ -106,6 +104,7 @@ class mod_gerautog_mod_form extends moodleform_mod
         $mform->addElement('select', 'delivery', get_string('delivery', 'mod_gerautog'), $deliveryoptions);
         $mform->setDefault('delivery', 0);
         $mform->addHelpButton('delivery', 'delivery', 'mod_gerautog');
+*/
 
         // Add standard elements.
         $this->standard_coursemodule_elements();
@@ -125,25 +124,14 @@ class mod_gerautog_mod_form extends moodleform_mod
      * @return void
      */
     public function data_preprocessing(&$data) {
-        global $CFG;
-        //require_once(dirname(__FILE__) . '/locallib.php');
+
         parent::data_preprocessing($data);
         if ($this->current->instance) {
             $contextid = $this->context->id;
             $draftitemid = file_get_submitted_draft_itemid('arqs');
             file_prepare_draft_area($draftitemid, $contextid, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
             $data['arqs'] = $draftitemid;
-
-            // Prepare certificate text.
-            //$data['certificatetext'] = array('text' => $data['certificatetext'], 'format' => FORMAT_HTML);
-
-        } else { // Load default.
-            //$data['certificatetext'] = array('text' => '', 'format' => FORMAT_HTML);
         }
-
-        // Completion rules.
-        //$data['completiontimeenabled'] = !empty($data['requiredtime']) ? 1 : 0;
-
     }
 
 
@@ -155,7 +143,6 @@ class mod_gerautog_mod_form extends moodleform_mod
         if (isset($data->arqs) && !empty($data->arqs)
             && !$this->check_has_files('arqs')) {
                 $data->arqs = null;
-
         }
     }
 

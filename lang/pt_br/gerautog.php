@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['missingidandcmid'] = 'Sem dados do curso!';
+
 // Form Sections.
 $string['pluginname'] = 'Gerador de Autógrafos';
 $string['modulename'] = 'Gerador de Autógrafos';
@@ -65,4 +67,13 @@ $string['filenotfound'] = 'Arquivo não encontrado.';
 $string['openwindow'] = 'Clique no link abaixo para pegar seu livro.';
 $string['getbook'] = 'Ver livro';
 
-//$string['gerautogfieldset'] = '';
+// Email form
+$string['emailto'] = "Email do leitor";
+$string['emailto_help'] = "Email do leitor para enviar o livro.";
+$string['message_book'] = 'Messagem ao leitor.';
+$string['message_book_help'] = 'Messagem ao leitor para colocar no livro.';
+$string['autog_book'] = "Imagem do autógrafo";
+$string['autog_book_help'] = "Imagem do autógrafo a colocar no livro.";
+$string['send'] = 'Enviar';
+
+$string['pngerror'] = "Arquivo PNG deve estar em modo 'não-entrelaçado'.";

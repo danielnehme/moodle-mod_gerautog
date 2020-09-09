@@ -25,6 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['missingidandcmid'] = 'No course data!';
+
 $string['pluginname'] = 'Autograph Generator';
 $string['modulename'] = 'Autograph Generator';
 $string['modulenameplural'] = 'Autographs Generators';
@@ -65,4 +67,13 @@ $string['filenotfound'] = 'File not found';
 $string['openwindow'] = 'Click the link below to get your book:';
 $string['getbook'] = 'View book';
 
-//$string['gerautogfieldset'] = '';
+// Email form
+$string['emailto'] = "Reader's email";
+$string['emailto_help'] = "Reader's email to send book.";
+$string['message_book'] = 'Message to reader';
+$string['message_book_help'] = 'Message to the reader to put in the book.';
+$string['autog_book'] = "Author's autograph image";
+$string['autog_book_help'] = "Author's autograph to put in the book.";
+$string['send'] = 'Send';
+
+$string['pngerror'] = 'PNG interlacing not supported.';
