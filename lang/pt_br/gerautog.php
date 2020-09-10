@@ -57,7 +57,7 @@ Depois que estudante emite seu certificado, se ele clicar na atividade certifica
 
 // Delivery options.
 $string['openbrowser'] = 'Visualizar em uma nova janela';
-$string['download'] = 'Forçar o download';
+$string['download'] = 'Baixar';
 $string['emailbook'] = 'Enviar por Email';
 $string['nodelivering'] = 'Sem envio, o usuário vai receber o livro por outros meios';
 $string['emailoncompletion'] = 'Enviar na conclusão do curso';

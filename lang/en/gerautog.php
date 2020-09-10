@@ -57,7 +57,7 @@ $string['delivery_help'] = 'Choose here how you would like your students to get 
 
 // Delivery options.
 $string['openbrowser'] = 'Open in new window';
-$string['download'] = 'Force download';
+$string['download'] = 'Download';
 $string['emailbook'] = 'Email';
 $string['nodelivering'] = 'No delivering, user will receive this certificate using others ways';
 $string['emailoncompletion'] = 'Email on course completion';
