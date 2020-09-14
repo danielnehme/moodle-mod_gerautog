@@ -25,6 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->libdir . '/filelib.php');
+require_once($CFG->dirroot . '/mod/gerautog/lib.php');
 
 /**
  * Module instance settings form.
@@ -42,7 +44,7 @@ class mod_gerautog_mod_form extends moodleform_mod
     {
         global $CFG;
 
-        $mform = $this->_form;
+        $mform =& $this->_form;
 
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -66,11 +68,20 @@ class mod_gerautog_mod_form extends moodleform_mod
         } else {
             $this->add_intro_editor();
         }
-
-        //$mform->addElement('filepicker', 'userfile', get_string('file'), null, array('maxbytes' => 10485760, 'accepted_types' => array('.pdf')));
+        /*
+        $contextid = $this->context->id;
+        $draftitemid = file_get_submitted_draft_itemid('arqs');
+        file_prepare_draft_area($draftitemid, $contextid, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
+        $data['arqs'] = $draftitemid;
+        $mform->set_data($data);
+        */
+        //$mform->addElement('filepicker', 'arqs',
+        //    get_string('setting_fileupload', 'mod_gerautog'), null,
+        //    $this->get_filemanager_options_array());
         $mform->addElement('filemanager', 'arqs',
             get_string('setting_fileupload', 'mod_gerautog'), null,
             $this->get_filemanager_options_array());
+        $mform->addRule('arqs', null, 'required', null, 'client');
         $mform->addHelpButton('arqs', 'setting_fileupload', 'mod_gerautog');
 
 /*
@@ -129,11 +140,20 @@ class mod_gerautog_mod_form extends moodleform_mod
     public function data_preprocessing(&$data) {
         parent::data_preprocessing($data);
         if ($this->current->instance) {
+            //$mform = $this->_form;
             $contextid = $this->context->id;
             $draftitemid = file_get_submitted_draft_itemid('arqs');
             file_prepare_draft_area($draftitemid, $contextid, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
+            global $USER;
+            $usercontext = context_user::instance($USER->id);
+            $fs = get_file_storage();
+            $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
             $data['arqs'] = $draftitemid;
-            //var_dump($data);
+            //$mform->set_data($data);
+            //var_dump($files);
+            //foreach ($files as $f) {
+            //    echo $f->get_filename() . '<br />';
+            //}
             //echo " :: data_preprocessing";
         }
     }
@@ -144,9 +164,18 @@ class mod_gerautog_mod_form extends moodleform_mod
 
         // File manager always creata a Files folder, so certimages is never empty.
         // I must check if it has a file or it's only a empty files folder reference.
-        if (isset($data->arqs) && !empty($data->arqs)
-            && !$this->check_has_files('arqs')) {
-                $data->arqs = null;
+        //if (isset($data->arqs) && !empty($data->arqs)
+        //    && !$this->check_has_files('arqs')) {
+        //        $data->arqs = null;
+        //}
+        global $USER;
+        $usercontext = context_user::instance($USER->id);
+        $fs = get_file_storage();
+        if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->arqs, 'sortorder, id', false)) {
+            file_save_draft_area_files($data->arqs, $this->context->id, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
+            //foreach ($files as $f) {
+            //    echo $f->get_filename() . '<br />';
+            //}
         }
     }
 
@@ -163,7 +192,13 @@ class mod_gerautog_mod_form extends moodleform_mod
         $fs = get_file_storage();
         $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
         //var_dump($files);
-        //echo " :: check_has_files";
+
+        //echo " :: check_has_files :: " . count($files);
+        if (count($files) == 1) {
+            file_save_draft_area_files($draftitemid, $this->context->id, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
+            //echo " :: check_has_files :: ENTROU :: " . count($files);
+        }
+
         return (count($files) > 0);
     }
 
@@ -184,29 +219,32 @@ class mod_gerautog_mod_form extends moodleform_mod
      * @return array
      */
     public function validation($data, $files) {
-        global $USER;
         $errors = parent::validation($data, $files);
+
+        global $USER;
         $usercontext = context_user::instance($USER->id);
         $fs = get_file_storage();
         if (!$files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data['arqs'], 'sortorder, id', false)) {
             $errors['arqs'] = get_string('required');
             return $errors;
         }
-        var_dump($files);
+        /*
+        //var_dump($files);
         if (count($files) == 1) {
             // No need to select main file if only one picked.
 
             // Save file
             file_save_draft_area_files($data['arqs'], $this->context->id, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
-
+            echo " :: check_has_files :: ENTROU :: " . $data['arqs'];
 
             return $errors;
         }
+        */
         return $errors;
     }
 
 
-    /**
+    /*
      * Save upload files in $fileinfo array and return the filename
      *
      * @param string $formitemid Upload file form id

@@ -144,29 +144,31 @@ function gerautog_pluginfile($course, $cm, $context, $filearea, $args, $forcedow
     }
     else return false;
      */
+var_dump($context);
+echo "gerautog_pluginfile :: ";
 
     // Check the contextlevel is as expected - if your plugin is a block, this becomes CONTEXT_BLOCK, etc.
     if ($context->contextlevel != CONTEXT_MODULE) {
         return false;
     }
-    echo "um <br />";
+
 
     // Make sure the filearea is one of those used by the plugin.
     if ($filearea !== 'arqs' && $filearea !== 'autog') {
         return false;
     }
-echo "dois <br />";
+
     // Make sure the user is logged in and has access to the module (plugins that are not course modules should leave out the 'cm' part).
     require_login($course, true, $cm);
-echo "três <br />";
+
     // Check the relevant capabilities - these may vary depending on the filearea being accessed.
     if (!has_capability('mod/gerautog:view', $context)) {
         return false;
     }
-echo "quatro <br />";
+
     // Leave this line out if you set the itemid to null in make_pluginfile_url (set $itemid to 0 instead).
     $itemid = array_shift($args); // The first item in the $args array.
-var_dump($itemid);
+    //var_dump($itemid);
     // Use the itemid to retrieve any relevant data records and perform any security checks to see if the
     // user really does have access to the file in question.
 
@@ -181,7 +183,7 @@ var_dump($itemid);
     // Retrieve the file from the Files API.
     $fs = get_file_storage();
     $file = $fs->get_file($context->id, 'mod_gerautog', $filearea, $itemid, $filepath, $filename);
-    var_dump($file);
+    //var_dump($file);
     if (!$file) {
         return false; // The file does not exist.
     }

@@ -166,7 +166,7 @@ if (!$url->get_param('action')) {
           if($data->message) $texto=$data->message;
           else $texto='É um teste Nasnuv!';
           $pdf->SetXY(80,130);
-          $pdf->MultiCell(50,0,$texto,0,'J');
+          $pdf->MultiCell(50,0,$texto,0,'L');
 
 
           $draftitemid = file_get_submitted_draft_itemid('autog');
