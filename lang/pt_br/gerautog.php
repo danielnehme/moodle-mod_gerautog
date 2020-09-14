@@ -64,7 +64,8 @@ $string['emailoncompletion'] = 'Enviar na conclusão do curso';
 
 $string['filenotfound'] = 'Arquivo não encontrado.';
 
-$string['openwindow'] = 'Clique no link abaixo para pegar seu livro.';
+$string['openwindow'] = 'Clique no botão abaixo para ver o livro autografado!';
+$string['generatebook'] = 'Gerar livro autografado';
 $string['getbook'] = 'Ver livro';
 
 // Email form

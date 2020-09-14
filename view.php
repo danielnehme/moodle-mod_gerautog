@@ -103,166 +103,165 @@ if ($action) {
 
 if (!$url->get_param('action')) {
 
-    echo $OUTPUT->header();
+  echo $OUTPUT->header();
 
-    //var_dump($cm);
-    //var_dump($course);
-    //var_dump($moduleinstance);
-    //var_dump($modulecontext);
+  //var_dump($cm);
+  //var_dump($course);
+  //var_dump($moduleinstance);
+  //var_dump($modulecontext);
 
-    $data = new stdClass();
-    $data->course = $cm->course;
-    $data->id = $cm->id;
+  $data = new stdClass();
+  $data->course = $cm->course;
+  $data->id = $cm->id;
 
-    $mform = new gerautog_email_form();
+  $mform = new gerautog_email_form();
 
-    if (!$mform->get_data()) {
-        $mform->set_data($data);
-        $mform->display();
-    }
-    else {
-        $data = $mform->get_data();
+  if (!$mform->get_data()) {
+      $mform->set_data($data);
+      $mform->display();
+  }
+  else {
+		global $USER;
+		$usercontext = context_user::instance($USER->id);
+    $data = $mform->get_data();
 
 
-        $arq = null;
+    $arq = null;
 
-        //$pdf = new Fpdi();
-        $pdf = new TcpdfFpdi();
-        $pdf->AddPage();
+    //$pdf = new Fpdi();
+    $pdf = new TcpdfFpdi();
 
-        $cxt = context_module::instance($id);
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($cxt->id, 'mod_gerautog', 'arqs', $id);
-        //var_dump($files);
-        foreach ($files as $f) {
-            // $f is an instance of stored_file
+    $cxt = context_module::instance($id);
+    $fs = get_file_storage();
+    //$files = $fs->get_area_files($cxt->id, 'mod_gerautog', 'arqs', $id);
+		$draftitemid = file_get_submitted_draft_itemid('arqs');
+		file_prepare_draft_area($draftitemid, $cxt->id, 'mod_gerautog', 'arqs', 1, array('subdirs' => false,  'maxfiles' => 1,'accepted_types' => array('.pdf')));
+		$files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
+    //var_dump($files);
+    foreach ($files as $f) {
+        // $f is an instance of stored_file
+        //echo $f->get_filename() . '<br />';
+        if (strlen($f->get_filename()) > 1) {
             //echo $f->get_filename() . '<br />';
-            if (strlen($f->get_filename()) > 1) {
-                echo $f->get_filename() . '<br />';
-                $arq = $f;
-            }
+            $arq = $f;
         }
-
-
-        $book = $fs->get_file($arq->get_contextid(), $arq->get_component(), $arq->get_filearea(), $arq->get_itemid(), $arq->get_filepath(), $arq->get_filename());
-
-        // Read contents.
-        if ($book) {
-            $tmpfilename = $book->copy_content_to_temp('mod_gerautog', 'book_');
-            $pdf->setSourceFile($tmpfilename);
-            @unlink($tmpfilename);
-            $tplId = $pdf->importPage(1);
-            $pdf->useTemplate($tplId);
-            $pdf->SetFont('freesans', 'B', '24');
-            // decode para traduzir acentos
-            if($data->message) $texto=$data->message;
-            else $texto='É um teste Nasnuv!';
-            $pdf->SetXY(70,0);
-            $pdf->Cell(10,100,$texto);
-
-            //$cxt = context_module::instance($id);
-            //$fs = get_file_storage();
-            //$files = $fs->get_area_files($cxt->id, 'mod_gerautog', 'autog', $id);
-            //var_dump($files);ile migrate - update flag
-            global $USER;
-            $draftitemid = file_get_submitted_draft_itemid('autog');
-            file_prepare_draft_area($draftitemid, $modulecontext->id, 'mod_gerautog', 'autog', null, array('subdirs' => false, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 1,'accepted_types' => array('image')));
-            $usercontext = context_user::instance($USER->id);
-            $fs = get_file_storage();
-            $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
-            foreach ($files as $f) {
-                //echo $f->get_filename() . '<br />';
-                if (strlen($f->get_filename()) > 1) {
-                    echo $f->get_filename() . '<br />';
-                    $arq_img = $f;
-                }
-            }
-            /*
-            $fileinfo = array('contextid' => $modulecontext->id,
-                              'component' => 'mod_gerautog',
-                              'filearea' => 'autog',
-                              'itemid' => 1,
-                              'filepath' => '/temp/mod_gerautog/');
-            */
-            $imgarq = $fs->get_file($arq_img->get_contextid(), $arq_img->get_component(), $arq_img->get_filearea(), $arq_img->get_itemid(), $arq_img->get_filepath(), $arq_img->get_filename());
-            //var_dump($imgarq);
-
-            if ($imgarq) {
-                $ext = pathinfo($arq_img->get_filename(), PATHINFO_EXTENSION);
-                $tmpfilename = $imgarq->copy_content_to_temp('mod_gerautog', 'img_');
-                try{
-                    $pdf->Image($tmpfilename,90,6,0,0,$ext);
-                }
-                catch (Exception $e){
-                    $msge = $e->getMessage();
-                    $msgc = "FPDF error: Interlacing not supported: " . $tmpfilename;
-                    if (strcmp($msge,$msgc)==0) {
-                        $str = get_string('pngerror', 'mod_gerautog');
-                        echo html_writer::tag('p', $str, array('style' => 'text-align:center'));
-                    }
-                    @unlink($tmpfilename);
-                }
-                @unlink($tmpfilename);
-            }
-
-            $pdf->SetFont('freesans','B',16);
-            $pdf->SetXY(80,200);
-            $pdf->Write(10,'www.nasnuv.com.br','https://www.nasnuv.com.br');
-            $arqn = 'aut_' . $arq->get_filename();
-
-            $fs->delete_area_files($usercontext->id,'mod_gerautog','temp');
-            $fileinfo = array('contextid' => $usercontext->id,
-                                'component' => 'mod_gerautog',
-                                'filearea' => 'temp',
-                                'itemid' => 1,
-                                'filepath' => '/',
-                                'mimetype' => 'application/pdf',
-                                'userid' => $USER->id,
-                                'filename' => $arqn
-                        );
-            $file = $fs->create_file_from_string($fileinfo, $pdf->Output('', 'S'));
-
-
-        } else {
-        print_error(get_string('filenotfound', 'mod_gerautog'));
-        }
-
     }
-/*
 
-case self::OUTPUT_SEND_EMAIL:
-                    $this->send_certificade_email($issuecert);
-                    echo $OUTPUT->header();
-                    echo $OUTPUT->box(get_string('emailsent', 'simplecertificate') . '<br>' . $OUTPUT->close_window_button(),
-                                    'generalbox', 'notice');
-                    echo $OUTPUT->footer();
-                break;
+  	$book = $fs->get_file($arq->get_contextid(), $arq->get_component(), $arq->get_filearea(), $arq->get_itemid(), $arq->get_filepath(), $arq->get_filename());
 
-*/
+    // Read contents.
+    if ($book) {
+      $tmpfilename = $book->copy_content_to_temp('mod_gerautog', 'book_');
+      $pageCount = $pdf->setSourceFile($tmpfilename);
+      @unlink($tmpfilename);
+
+      for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+				// import a page
+        $templateId = $pdf->importPage($pageNo);
+				$pdf->AddPage();
+				// use the imported page and adjust the page size
+				$pdf->useTemplate($templateId, ['adjustPageSize' => true]);
+				if ($pageNo == 2) {
+          $pdf->SetFont('freesans', 'I', '12');
+          if($data->message) $texto=$data->message;
+          else $texto='É um teste Nasnuv!';
+          $pdf->SetXY(80,130);
+          $pdf->MultiCell(50,0,$texto,0,'J');
+
+
+          $draftitemid = file_get_submitted_draft_itemid('autog');
+          file_prepare_draft_area($draftitemid, $modulecontext->id, 'mod_gerautog', 'autog', null, array('subdirs' => false, 'maxfiles' => 1,'accepted_types' => array('image')));
+
+          $fs = get_file_storage();
+          $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
+					//var_dump($files);
+          foreach ($files as $f) {
+              //echo $f->get_filename() . '<br />';
+              if (strlen($f->get_filename()) > 1) {
+                  //echo $f->get_filename() . '<br />';
+                  $arq_img = $f;
+              }
+          }
+
+          $imgarq = $fs->get_file($arq_img->get_contextid(), $arq_img->get_component(), $arq_img->get_filearea(), $arq_img->get_itemid(), $arq_img->get_filepath(), $arq_img->get_filename());
+
+          if ($imgarq) {
+              $ext = pathinfo($arq_img->get_filename(), PATHINFO_EXTENSION);
+              $tmpfilename = $imgarq->copy_content_to_temp('mod_gerautog', 'img_');
+              try{
+                  $pdf->Image($tmpfilename,90,150,0,0,$ext);
+              }
+              catch (Exception $e){
+                  $msge = $e->getMessage();
+                  $msgc = "FPDF error: Interlacing not supported: " . $tmpfilename;
+                  if (strcmp($msge,$msgc)==0) {
+                      $str = get_string('pngerror', 'mod_gerautog');
+                      echo html_writer::tag('p', $str, array('style' => 'text-align:center'));
+                  }
+                  @unlink($tmpfilename);
+              }
+              @unlink($tmpfilename);
+          }
+				}
+      }
+
+      $arqn = 'aut_' . $arq->get_filename();
+      $fs->delete_area_files($usercontext->id,'mod_gerautog','temp');
+      $fileinfo = array('contextid' => $usercontext->id,
+                          'component' => 'mod_gerautog',
+                          'filearea' => 'temp',
+                          'itemid' => 1,
+                          'filepath' => '/',
+                          'mimetype' => 'application/pdf',
+                          'userid' => $USER->id,
+                          'filename' => $arqn
+                  );
+      $file = $fs->create_file_from_string($fileinfo, $pdf->Output('', 'S'));
+			//var_dump($file);
+
+    } else {
+    print_error(get_string('filenotfound', 'mod_gerautog'));
+    }
+
+		/*
+		case self::OUTPUT_SEND_EMAIL:
+		                    $this->send_certificade_email($issuecert);
+		                    echo $OUTPUT->header();
+		                    echo $OUTPUT->box(get_string('emailsent', 'simplecertificate') . '<br>' . $OUTPUT->close_window_button(),
+		                                    'generalbox', 'notice');
+		                    echo $OUTPUT->footer();
+		                break;
+
+		*/
+		$str = get_string('openwindow', 'mod_gerautog');
+		echo html_writer::tag('p', $str, array('style' => 'text-align:center'));
     $linkname = get_string('getbook', 'mod_gerautog');
     $link = new moodle_url('/mod/gerautog/view.php',array('id' => $id, 'action' => 'get'));
     $button = new single_button($link, $linkname);
     $button->add_action(new popup_action('click', $link, 'view' . $id,array('height' => 600, 'width' => 800)));
 
     echo html_writer::tag('div', $OUTPUT->render($button), array('style' => 'text-align:center'));
-
-    echo $OUTPUT->footer();
+	}
+  echo $OUTPUT->footer();
 }
-/************* OPEN PDF ****************/
-global $USER;
-$usercontext = context_user::instance($USER->id);
-$fs = get_file_storage();
-$fileinfo = array('contextid' => $usercontext->id,
-                    'component' => 'mod_gerautog',
-                    'filearea' => 'temp',
-                    'itemid' => 1
-            );
-$files = $fs->get_area_files($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid']);
-foreach ($files as $f) {
-    if (strlen($f->get_filename()) > 1) {
-        echo $f->get_filename() . '<br />';
-        $arq = $f;
-    }
+else {
+	/************* OPEN PDF ****************/
+	global $USER;
+	$usercontext = context_user::instance($USER->id);
+	$fs = get_file_storage();
+	$fileinfo = array('contextid' => $usercontext->id,
+	                    'component' => 'mod_gerautog',
+	                    'filearea' => 'temp',
+	                    'itemid' => 1
+	            );
+	$files = $fs->get_area_files($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid']);
+  //var_dump($files);
+	foreach ($files as $f) {
+	    if (strlen($f->get_filename()) > 1) {
+	        //echo $f->get_filename() . '<br />';
+	        $arq = $f;
+	    }
+	}
+	send_stored_file($arq, 10, 0, false, array('dontdie' => true));
+	//send_stored_file($arq, 10, 0, true, array('filename' => $arq->get_filename(), 'dontdie' => true));
 }
-send_stored_file($arq, 10, 0, false, array('dontdie' => true));
-//send_stored_file($file, 10, 0, true, array('filename' => $file->get_filename(), 'dontdie' => true));

@@ -54,9 +54,9 @@ class gerautog_email_form extends moodleform {
         $mform->addElement('filemanager', 'autog', get_string('autog_book', 'mod_gerautog'), null, $this->get_filemanager_options_array());
         //$mform->addRule('autog', null, 'required', null, 'client');
         $mform->addHelpButton('autog', 'autog_book', 'mod_gerautog');
-//var_dump($mform);
+        //var_dump($mform);
         // Add submit and cancel buttons.
-        $this->add_action_buttons(false, get_string('send', 'mod_gerautog'));
+        $this->add_action_buttons(false, get_string('generatebook', 'mod_gerautog'));
     }
 
     public function data_preprocessing(&$data) {

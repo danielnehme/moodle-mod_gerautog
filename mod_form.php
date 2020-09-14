@@ -41,7 +41,7 @@ class mod_gerautog_mod_form extends moodleform_mod
     public function definition()
     {
         global $CFG;
-        
+
         $mform = $this->_form;
 
         // Adding the "general" fieldset, where all the common settings are shown.
@@ -67,7 +67,10 @@ class mod_gerautog_mod_form extends moodleform_mod
             $this->add_intro_editor();
         }
 
-        $mform->addElement('filemanager', 'arqs', get_string('setting_fileupload', 'mod_gerautog'), null, $this->get_filemanager_options_array());
+        //$mform->addElement('filepicker', 'userfile', get_string('file'), null, array('maxbytes' => 10485760, 'accepted_types' => array('.pdf')));
+        $mform->addElement('filemanager', 'arqs',
+            get_string('setting_fileupload', 'mod_gerautog'), null,
+            $this->get_filemanager_options_array());
         $mform->addHelpButton('arqs', 'setting_fileupload', 'mod_gerautog');
 
 /*
@@ -124,13 +127,14 @@ class mod_gerautog_mod_form extends moodleform_mod
      * @return void
      */
     public function data_preprocessing(&$data) {
-
         parent::data_preprocessing($data);
         if ($this->current->instance) {
             $contextid = $this->context->id;
             $draftitemid = file_get_submitted_draft_itemid('arqs');
             file_prepare_draft_area($draftitemid, $contextid, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
             $data['arqs'] = $draftitemid;
+            //var_dump($data);
+            //echo " :: data_preprocessing";
         }
     }
 
@@ -158,17 +162,18 @@ class mod_gerautog_mod_form extends moodleform_mod
         $usercontext = context_user::instance($USER->id);
         $fs = get_file_storage();
         $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
-
+        //var_dump($files);
+        //echo " :: check_has_files";
         return (count($files) > 0);
     }
 
 
     private function get_filemanager_options_array()
     {
-        global $COURSE;
+        //global $COURSE;
+        //'maxbytes' => $COURSE->maxbytes,
 
-        return array('subdirs' => true, 'maxbytes' => $COURSE->maxbytes, 'maxfiles' => 1,
-                'accepted_types' => array('.pdf'));
+        return array('subdirs' => false, 'maxfiles' => 1,'accepted_types' => array('.pdf'));
     }
 
     /**
@@ -179,8 +184,24 @@ class mod_gerautog_mod_form extends moodleform_mod
      * @return array
      */
     public function validation($data, $files) {
+        global $USER;
         $errors = parent::validation($data, $files);
+        $usercontext = context_user::instance($USER->id);
+        $fs = get_file_storage();
+        if (!$files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data['arqs'], 'sortorder, id', false)) {
+            $errors['arqs'] = get_string('required');
+            return $errors;
+        }
+        var_dump($files);
+        if (count($files) == 1) {
+            // No need to select main file if only one picked.
 
+            // Save file
+            file_save_draft_area_files($data['arqs'], $this->context->id, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
+
+
+            return $errors;
+        }
         return $errors;
     }
 
