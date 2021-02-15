@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_gerautog';
 $plugin->release = '0.2.3';
-$plugin->version = 2021020601;
+$plugin->version = 2021021500;
 $plugin->requires = 2019111800;
 // MATURITY_ALPHA, MATURITY_BETA, MATURITY_RC, MATURITY_STABLE.
 $plugin->maturity = MATURITY_BETA;

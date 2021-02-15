@@ -263,6 +263,8 @@ if (!$url->get_param('action')) {
     $button2->add_action(new popup_action('click', $link, 'view' . $id,array('height' => 600, 'width' => 800)));
 
     echo html_writer::tag('div', $OUTPUT->render($button2), array('style' => 'text-align:center'));
+		echo html_writer::tag('button', get_string('back', 'mod_gerautog'), array('class'=>'btn btn-secondary', 'type' => 'button','onclick'=>'window.history.back();'));
+
   }
   echo $OUTPUT->footer();
 }

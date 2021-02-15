@@ -69,6 +69,8 @@ $string['generatebook'] = 'Gerar livro autografado';
 $string['getbook'] = 'Ver livro';
 
 // Email form
+$string['tit_config'] = "Gerador de Autógrafos - Configuração";
+$string['desc_config'] = "Coloque o email, mensagem para o leitor a ser colocada no livro e a imagem do autógrafo. O email e a mensagem são opcionais. Sugere-se não colocar o email, caso o objetivo seja apenas visualizar o resultado. Ao visualizar o livro, sempre é possível fazer também o download.";
 $string['emailto'] = "Email do leitor";
 $string['emailto_help'] = "Email do leitor para enviar o livro.";
 $string['message_book'] = 'Messagem ao leitor.';
@@ -82,3 +84,5 @@ $string['pngerror'] = "Arquivo PNG deve estar em modo 'não-entrelaçado'.";
 $string['emailsent'] = 'Email enviado!';
 $string['emailnotsent'] = 'Não conseguimos enviar o email!';
 $string['emailnotfound'] = 'Email não cadastrado no evento.';
+
+$string['back'] = "Voltar";

@@ -73,6 +73,8 @@ class gerautog_email_form extends moodleform {
         $mform->addElement('hidden', 'id');
         $mform->setType('id', PARAM_INT);
 
+        $mform->addElement('static', 'description', '', get_string('desc_config', 'mod_gerautog'));
+
         // Email to...
         $mform->addElement('text', 'emailto', get_string('emailto', 'mod_gerautog'), array('size' => '40', 'maxsize' => '200'));
         $mform->setType('emailto', PARAM_TEXT);
@@ -85,6 +87,7 @@ class gerautog_email_form extends moodleform {
         // Get autograph image
         $mform->addElement('filemanager', 'autog', get_string('autog_book', 'mod_gerautog'), null, $this->get_filemanager_options_array());
         $mform->addHelpButton('autog', 'autog_book', 'mod_gerautog');
+        $mform->addRule('autog', null, 'required', null, 'client');
 
         // Add submit and cancel buttons.
         $this->add_action_buttons(false, get_string('generatebook', 'mod_gerautog'));

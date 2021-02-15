@@ -69,6 +69,8 @@ $string['generatebook'] = 'Generate autographed book';
 $string['getbook'] = 'View book';
 
 // Email form
+$string['tit_config'] = "Autograph Generator - Configuration";
+$string['desc_config'] = "Place the email, message for the reader to be placed in the book and the image of the autograph. Email and message are optional. It is suggested not to put the email, if the goal is just to visualize the result. When viewing the book, it is always possible to also download.";
 $string['emailto'] = "Reader's email";
 $string['emailto_help'] = "Reader's email to send book.";
 $string['message_book'] = 'Message to reader';
@@ -82,3 +84,5 @@ $string['pngerror'] = 'PNG interlacing not supported.';
 $string['emailsent'] = 'Email sent!';
 $string['emailnotsent'] = 'Email with problem!';
 $string ['emailnotfound'] = 'Email not registered in the event.';
+
+$string['back'] = "Go Back";
