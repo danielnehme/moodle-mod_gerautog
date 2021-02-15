@@ -68,57 +68,12 @@ class mod_gerautog_mod_form extends moodleform_mod
         } else {
             $this->add_intro_editor();
         }
-        /*
-        $contextid = $this->context->id;
-        $draftitemid = file_get_submitted_draft_itemid('arqs');
-        file_prepare_draft_area($draftitemid, $contextid, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
-        $data['arqs'] = $draftitemid;
-        $mform->set_data($data);
-        */
-        //$mform->addElement('filepicker', 'arqs',
-        //    get_string('setting_fileupload', 'mod_gerautog'), null,
-        //    $this->get_filemanager_options_array());
+
         $mform->addElement('filemanager', 'arqs',
             get_string('setting_fileupload', 'mod_gerautog'), null,
             $this->get_filemanager_options_array());
         $mform->addRule('arqs', null, 'required', null, 'client');
         $mform->addHelpButton('arqs', 'setting_fileupload', 'mod_gerautog');
-
-/*
-        // Issue options.
-
-        $mform->addElement('header', 'issueoptions', get_string('issueoptions', 'mod_gerautog'));
-
-        // Email to teachers ?
-        $mform->addElement('selectyesno', 'emailauthors', get_string('emailauthors', 'mod_gerautog'));
-        $mform->setDefault('emailauthors', 0);
-        $mform->addHelpButton('emailauthors', 'emailauthors', 'mod_gerautog');
-
-        // Email Others.
-        $mform->addElement('text', 'emailothers', get_string('emailothers', 'mod_gerautog'), array('size' => '40', 'maxsize' => '200'));
-        $mform->setType('emailothers', PARAM_TEXT);
-        $mform->addHelpButton('emailothers', 'emailothers', 'mod_gerautog');
-
-        // Email From.
-        $mform->addElement('text', 'emailfrom', get_string('emailfrom', 'mod_gerautog'), array('size' => '40', 'maxsize' => '200'));
-        $mform->setDefault('emailfrom', $CFG->supportname);
-        $mform->setType('emailfrom', PARAM_EMAIL);
-        $mform->addHelpButton('emailfrom', 'emailfrom', 'mod_gerautog');
-        $mform->setAdvanced('emailfrom');
-
-        // Delivery Options (Email, Download,...).
-        $deliveryoptions = array(
-            0 => get_string('openbrowser', 'mod_gerautog'),
-            1 => get_string('download', 'mod_gerautog'),
-            2 => get_string('emailbook', 'mod_gerautog'),
-            3 => get_string('nodelivering', 'mod_gerautog'),
-            4 => get_string('emailoncompletion', 'mod_gerautog'),
-        );
-
-        $mform->addElement('select', 'delivery', get_string('delivery', 'mod_gerautog'), $deliveryoptions);
-        $mform->setDefault('delivery', 0);
-        $mform->addHelpButton('delivery', 'delivery', 'mod_gerautog');
-*/
 
         // Add standard elements.
         $this->standard_coursemodule_elements();
@@ -138,9 +93,9 @@ class mod_gerautog_mod_form extends moodleform_mod
      * @return void
      */
     public function data_preprocessing(&$data) {
+
         parent::data_preprocessing($data);
         if ($this->current->instance) {
-            //$mform = $this->_form;
             $contextid = $this->context->id;
             $draftitemid = file_get_submitted_draft_itemid('arqs');
             file_prepare_draft_area($draftitemid, $contextid, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
@@ -149,12 +104,6 @@ class mod_gerautog_mod_form extends moodleform_mod
             $fs = get_file_storage();
             $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
             $data['arqs'] = $draftitemid;
-            //$mform->set_data($data);
-            //var_dump($files);
-            //foreach ($files as $f) {
-            //    echo $f->get_filename() . '<br />';
-            //}
-            //echo " :: data_preprocessing";
         }
     }
 
@@ -162,52 +111,16 @@ class mod_gerautog_mod_form extends moodleform_mod
 
     public function data_postprocessing($data) {
 
-        // File manager always creata a Files folder, so certimages is never empty.
-        // I must check if it has a file or it's only a empty files folder reference.
-        //if (isset($data->arqs) && !empty($data->arqs)
-        //    && !$this->check_has_files('arqs')) {
-        //        $data->arqs = null;
-        //}
         global $USER;
         $usercontext = context_user::instance($USER->id);
         $fs = get_file_storage();
         if ($files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->arqs, 'sortorder, id', false)) {
             file_save_draft_area_files($data->arqs, $this->context->id, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
-            //foreach ($files as $f) {
-            //    echo $f->get_filename() . '<br />';
-            //}
         }
     }
-
-
-    private function check_has_files($itemname) {
-        global $USER;
-
-        $draftitemid = file_get_submitted_draft_itemid($itemname);
-        file_prepare_draft_area($draftitemid, $this->context->id, 'mod_gerautog', 'arqs', null,
-                                $this->get_filemanager_options_array());
-
-        // Get file from users draft area.
-        $usercontext = context_user::instance($USER->id);
-        $fs = get_file_storage();
-        $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
-        //var_dump($files);
-
-        //echo " :: check_has_files :: " . count($files);
-        if (count($files) == 1) {
-            file_save_draft_area_files($draftitemid, $this->context->id, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
-            //echo " :: check_has_files :: ENTROU :: " . count($files);
-        }
-
-        return (count($files) > 0);
-    }
-
 
     private function get_filemanager_options_array()
     {
-        //global $COURSE;
-        //'maxbytes' => $COURSE->maxbytes,
-
         return array('subdirs' => false, 'maxfiles' => 1,'accepted_types' => array('.pdf'));
     }
 
@@ -228,43 +141,9 @@ class mod_gerautog_mod_form extends moodleform_mod
             $errors['arqs'] = get_string('required');
             return $errors;
         }
-        /*
-        //var_dump($files);
-        if (count($files) == 1) {
-            // No need to select main file if only one picked.
 
-            // Save file
-            file_save_draft_area_files($data['arqs'], $this->context->id, 'mod_gerautog', 'arqs', 1, $this->get_filemanager_options_array());
-            echo " :: check_has_files :: ENTROU :: " . $data['arqs'];
-
-            return $errors;
-        }
-        */
         return $errors;
     }
 
 
-    /*
-     * Save upload files in $fileinfo array and return the filename
-     *
-     * @param string $formitemid Upload file form id
-     * @param array $fileinfo The file info array, where to store uploaded file
-     * @return string filename
-     */
-/*
-    private function save_upload_file($formitemid, array $fileinfo) {
-        // Clear file area.
-        if (empty($fileinfo['itemid'])) {
-            $fileinfo['itemid'] = '';
-        }
-
-        $fs = get_file_storage();
-        $fs->delete_area_files($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid']);
-        file_save_draft_area_files($formitemid, $fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid']);
-        // Get only files, not directories.
-        $files = $fs->get_area_files($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid'], '', false);
-        $file = array_shift($files);
-        return $file->get_filename();
-    }
-    */
 }

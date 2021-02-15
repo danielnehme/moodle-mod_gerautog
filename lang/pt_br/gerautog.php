@@ -64,7 +64,7 @@ $string['emailoncompletion'] = 'Enviar na conclusão do curso';
 
 $string['filenotfound'] = 'Arquivo não encontrado.';
 
-$string['openwindow'] = 'Clique no botão abaixo para ver o livro autografado!';
+$string['openwindow'] = 'Clique nos botões abaixo para ver o livro autografado!';
 $string['generatebook'] = 'Gerar livro autografado';
 $string['getbook'] = 'Ver livro';
 
@@ -76,5 +76,9 @@ $string['message_book_help'] = 'Messagem ao leitor para colocar no livro.';
 $string['autog_book'] = "Imagem do autógrafo";
 $string['autog_book_help'] = "Imagem do autógrafo a colocar no livro.";
 $string['send'] = 'Enviar';
-
+$string['emailsubject'] = 'Nasnuv: seu livro autografado!';
+$string['emailtext'] = 'Olá! Está em anexo seu livro autografado!';
 $string['pngerror'] = "Arquivo PNG deve estar em modo 'não-entrelaçado'.";
+$string['emailsent'] = 'Email enviado!';
+$string['emailnotsent'] = 'Não conseguimos enviar o email!';
+$string['emailnotfound'] = 'Email não cadastrado no evento.';

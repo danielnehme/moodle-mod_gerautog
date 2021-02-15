@@ -40,12 +40,6 @@ use core_availability\info_module;
 use core\message\inbound\private_files_handler;
 
 require_once($CFG->libdir . '/filelib.php');
-//require_once($CFG->libdir . '/tcpdf/tcpdf.php');
-//require_once($CFG->libdir . '/pdflib.php');
-
-//use setasign\Fpdi\Fpdi;
-//require_once($CFG->dirroot . '/mod/gerautog/libext/fpdf/fpdf.php');
-//require_once($CFG->dirroot . '/mod/gerautog/libext/fpdi/autoload.php');
 use setasign\Fpdi\TcpdfFpdi;
 require_once($CFG->libdir.'/pdflib.php');
 require_once($CFG->dirroot.'/mod/assign/feedback/editpdf/fpdi/autoload.php');
@@ -55,7 +49,6 @@ $id = optional_param('id', 0, PARAM_INT);
 
 // ... module instance id.
 $g  = optional_param('g', 0, PARAM_INT);
-
 
 $action = optional_param('action', '', PARAM_ALPHA);
 
@@ -80,17 +73,7 @@ $modulecontext = context_module::instance($cm->id);
 require_capability('mod/gerautog:view', $modulecontext);
 
 $url = new moodle_url('/mod/gerautog/view.php', array ('id' => $cm->id));
-/*
-$event = \mod_gerautog\event\course_module_viewed::create(array(
-    'objectid' => $moduleinstance->id,
-    'context' => $modulecontext
-));
-$event->add_record_snapshot('course', $course);
-$event->add_record_snapshot('gerautog', $moduleinstance);
-$event->trigger();
-*/
 
-//$PAGE->set_url('/mod/gerautog/view.php', array('id' => $cm->id));
 $PAGE->set_url($url);
 $PAGE->set_title(format_string($moduleinstance->name));
 $PAGE->set_heading(format_string($course->fullname));
@@ -98,23 +81,17 @@ $PAGE->set_context($modulecontext);
 $PAGE->set_cm($cm);
 
 if ($action) {
-    $url->param ('action', $action);
+    $url->param('action', $action);
 }
 
 if (!$url->get_param('action')) {
+	echo $OUTPUT->header();
 
-  echo $OUTPUT->header();
+	$data = new stdClass();
+	$data->course = $cm->course;
+	$data->id = $cm->id;
 
-  //var_dump($cm);
-  //var_dump($course);
-  //var_dump($moduleinstance);
-  //var_dump($modulecontext);
-
-  $data = new stdClass();
-  $data->course = $cm->course;
-  $data->id = $cm->id;
-
-  $mform = new gerautog_email_form();
+	$mform = new gerautog_email_form();
 
   if (!$mform->get_data()) {
       $mform->set_data($data);
@@ -124,25 +101,15 @@ if (!$url->get_param('action')) {
 		global $USER;
 		$usercontext = context_user::instance($USER->id);
     $data = $mform->get_data();
-
-
     $arq = null;
-
-    //$pdf = new Fpdi();
     $pdf = new TcpdfFpdi();
-
     $cxt = context_module::instance($id);
     $fs = get_file_storage();
-    //$files = $fs->get_area_files($cxt->id, 'mod_gerautog', 'arqs', $id);
 		$draftitemid = file_get_submitted_draft_itemid('arqs');
 		file_prepare_draft_area($draftitemid, $cxt->id, 'mod_gerautog', 'arqs', 1, array('subdirs' => false,  'maxfiles' => 1,'accepted_types' => array('.pdf')));
 		$files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
-    //var_dump($files);
     foreach ($files as $f) {
-        // $f is an instance of stored_file
-        //echo $f->get_filename() . '<br />';
         if (strlen($f->get_filename()) > 1) {
-            //echo $f->get_filename() . '<br />';
             $arq = $f;
         }
     }
@@ -168,17 +135,13 @@ if (!$url->get_param('action')) {
           $pdf->SetXY(80,130);
           $pdf->MultiCell(50,0,$texto,0,'L');
 
-
           $draftitemid = file_get_submitted_draft_itemid('autog');
           file_prepare_draft_area($draftitemid, $modulecontext->id, 'mod_gerautog', 'autog', null, array('subdirs' => false, 'maxfiles' => 1,'accepted_types' => array('image')));
 
           $fs = get_file_storage();
           $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
-					//var_dump($files);
           foreach ($files as $f) {
-              //echo $f->get_filename() . '<br />';
               if (strlen($f->get_filename()) > 1) {
-                  //echo $f->get_filename() . '<br />';
                   $arq_img = $f;
               }
           }
@@ -217,51 +180,107 @@ if (!$url->get_param('action')) {
                           'filename' => $arqn
                   );
       $file = $fs->create_file_from_string($fileinfo, $pdf->Output('', 'S'));
-			//var_dump($file);
 
+			// need send email
+			if (!empty($data->emailto))
+			{
+				$page = optional_param('page', 0, PARAM_INT);
+				$perpage = optional_param('perpage', 20, PARAM_INT);
+				$sort = optional_param('sort', '', PARAM_ACTION);
+				$direction = optional_param('dir', 'ASC', PARAM_ACTION);
+
+				// Get Oour users
+				$fields = array(
+						'courserole' => 1,
+						'systemrole' => 0,
+						'realname' => 1,
+						'username' => 1,
+				);
+				$ufiltering = new user_filtering($fields);
+				list($sql, $params) = $ufiltering->get_sql_filter();
+				$usercount = get_users(false);
+				$usersearchcount = get_users(false, '', true, null, '', '', '', '', '',
+												'*', $sql, $params);
+
+				if(empty($sort)) $sort = 'lastname';
+
+				$users = get_users_listing($sort, $direction, $page*$perpage,
+								$perpage, '', '', '', $sql, $params);
+				$columns = array('firstname', 'lastname', 'email', 'city', 'lastaccess');
+				foreach($columns as $column) {
+						$direction = ($sort == $column and $direction == "ASC") ? "DESC" : "ASC";
+						$$column = html_writer::link('view.php?sort='.$column.'&dir='.
+								$direction, get_string($column));
+				}
+
+				$found = false;
+				// email confirmation
+				foreach($users as $user) {
+					if ($data->emailto == $user->email)
+					{
+						$found = true;
+						$str = get_string('emailto', 'mod_gerautog');
+						echo $str . ": " . $data->emailto . '<br />';
+
+						$subject = get_string('emailsubject', 'gerautog');
+						$message = get_string('emailtext', 'gerautog') . "\n";
+						$messagehtml = text_to_html($message);
+
+						$hash = $file->get_contenthash();
+
+						$dirn1 = $hash[0] . $hash[1];
+						$dirn2 = $hash[2] . $hash[3];
+
+						$relativefilepath = "filedir" . DIRECTORY_SEPARATOR . $dirn1 . DIRECTORY_SEPARATOR . $dirn2. DIRECTORY_SEPARATOR . $hash;
+
+						$ret = email_to_user($user, $USER->email, $subject, $message, $messagehtml, $relativefilepath , $file->get_filename());
+						if($ret){
+							echo $OUTPUT->box(get_string('emailsent', 'gerautog') . '<br>',
+															'generalbox', 'notice');
+						}
+						else {
+							echo $OUTPUT->box(get_string('emailnotsent', 'gerautog') . '<br>',
+															'generalbox', 'notice');
+						}
+					}
+				}
+				if(!$found){
+					$str = get_string('emailnotfound', 'mod_gerautog');
+					echo $str . '<br />';
+				}
+			}
     } else {
     print_error(get_string('filenotfound', 'mod_gerautog'));
     }
 
-		/*
-		case self::OUTPUT_SEND_EMAIL:
-		                    $this->send_certificade_email($issuecert);
-		                    echo $OUTPUT->header();
-		                    echo $OUTPUT->box(get_string('emailsent', 'simplecertificate') . '<br>' . $OUTPUT->close_window_button(),
-		                                    'generalbox', 'notice');
-		                    echo $OUTPUT->footer();
-		                break;
-
-		*/
+		// message on the new page
 		$str = get_string('openwindow', 'mod_gerautog');
 		echo html_writer::tag('p', $str, array('style' => 'text-align:center'));
+
     $linkname = get_string('getbook', 'mod_gerautog');
     $link = new moodle_url('/mod/gerautog/view.php',array('id' => $id, 'action' => 'get'));
-    $button = new single_button($link, $linkname);
-    $button->add_action(new popup_action('click', $link, 'view' . $id,array('height' => 600, 'width' => 800)));
+    $button2 = new single_button($link, $linkname);
+    $button2->add_action(new popup_action('click', $link, 'view' . $id,array('height' => 600, 'width' => 800)));
 
-    echo html_writer::tag('div', $OUTPUT->render($button), array('style' => 'text-align:center'));
-	}
+    echo html_writer::tag('div', $OUTPUT->render($button2), array('style' => 'text-align:center'));
+  }
   echo $OUTPUT->footer();
 }
 else {
-	/************* OPEN PDF ****************/
-	global $USER;
-	$usercontext = context_user::instance($USER->id);
-	$fs = get_file_storage();
-	$fileinfo = array('contextid' => $usercontext->id,
-	                    'component' => 'mod_gerautog',
-	                    'filearea' => 'temp',
-	                    'itemid' => 1
-	            );
-	$files = $fs->get_area_files($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid']);
-  //var_dump($files);
-	foreach ($files as $f) {
-	    if (strlen($f->get_filename()) > 1) {
-	        //echo $f->get_filename() . '<br />';
-	        $arq = $f;
-	    }
-	}
-	send_stored_file($arq, 10, 0, false, array('dontdie' => true));
-	//send_stored_file($arq, 10, 0, true, array('filename' => $arq->get_filename(), 'dontdie' => true));
+  /************* OPEN PDF ****************/
+  global $USER;
+  $usercontext = context_user::instance($USER->id);
+  $fs = get_file_storage();
+  $fileinfo = array('contextid' => $usercontext->id,
+                    'component' => 'mod_gerautog',
+                    'filearea' => 'temp',
+                    'itemid' => 1
+                    );
+  $files = $fs->get_area_files($fileinfo['contextid'], $fileinfo['component'], $fileinfo['filearea'], $fileinfo['itemid']);
+  foreach ($files as $f) {
+    if (strlen($f->get_filename()) > 1) {
+        $arq = $f;
+    }
+  }
+  send_stored_file($arq, 10, 0, false, array('dontdie' => true));
 }

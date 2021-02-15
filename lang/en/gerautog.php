@@ -64,7 +64,7 @@ $string['emailoncompletion'] = 'Email on course completion';
 
 $string['filenotfound'] = 'File not found';
 
-$string['openwindow'] = 'Click on the button below to view the autographed book!';
+$string['openwindow'] = 'Click on the buttons below to view the autographed book!';
 $string['generatebook'] = 'Generate autographed book';
 $string['getbook'] = 'View book';
 
@@ -76,5 +76,9 @@ $string['message_book_help'] = 'Message to the reader to put in the book.';
 $string['autog_book'] = "Author's autograph image";
 $string['autog_book_help'] = "Author's autograph to put in the book.";
 $string['send'] = 'Send';
-
+$string['emailsubject'] = 'Nasnuv: your autographed book!';
+$string['emailtext'] = 'Hi, your autographed book is attached!';
 $string['pngerror'] = 'PNG interlacing not supported.';
+$string['emailsent'] = 'Email sent!';
+$string['emailnotsent'] = 'Email with problem!';
+$string ['emailnotfound'] = 'Email not registered in the event.';

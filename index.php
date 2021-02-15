@@ -28,7 +28,10 @@ require_once(__DIR__.'/lib.php');
 
 $id = required_param('id', PARAM_INT);
 
-$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
+$cm = get_coursemodule_from_id('gerautog', $id);
+$idcourse = $cm->course;
+
+$course = $DB->get_record('course', array('id' => $idcourse), '*', MUST_EXIST);
 require_course_login($course);
 
 $coursecontext = context_course::instance($course->id);
@@ -61,7 +64,7 @@ $table->attributes['class'] = 'generaltable mod_index';
 if ($course->format == 'weeks') {
     $table->head  = array(get_string('week'), get_string('name'));
     $table->align = array('center', 'left');
-} else if ($course->format == 'topics') {
+} elseif ($course->format == 'topics') {
     $table->head  = array(get_string('topic'), get_string('name'));
     $table->align = array('center', 'left', 'left', 'left');
 } else {
@@ -71,14 +74,9 @@ if ($course->format == 'weeks') {
 
 foreach ($gerautogs as $gerautog) {
     if (!$gerautog->visible) {
-        $link = html_writer::link(
-            new moodle_url('/mod/gerautog/view.php', array('id' => $gerautog->coursemodule)),
-            format_string($gerautog->name, true),
-            array('class' => 'dimmed'));
+        $link = html_writer::link(new moodle_url('/mod/gerautog/view.php', array('id' => $gerautog->coursemodule)), format_string($gerautog->name, true), array('class' => 'dimmed'));
     } else {
-        $link = html_writer::link(
-            new moodle_url('/mod/gerautog/view.php', array('id' => $gerautog->coursemodule)),
-            format_string($gerautog->name, true));
+        $link = html_writer::link(new moodle_url('/mod/gerautog/view.php', array('id' => $gerautog->coursemodule)), format_string($gerautog->name, true));
     }
 
     if ($course->format == 'weeks' or $course->format == 'topics') {

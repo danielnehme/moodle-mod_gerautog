@@ -22,17 +22,50 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir . '/formslib.php');
+
 
 /**
  * Description of email form
  *
  * @author Daniel Muller
  */
+
+require_once($CFG->libdir . '/formslib.php');
+require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot.'/course/lib.php');
+require_once($CFG->dirroot.'/notes/lib.php');
+require_once($CFG->libdir.'/tablelib.php');
+require_once($CFG->libdir.'/filelib.php');
+require_once($CFG->dirroot.'/enrol/locallib.php');
+
+require_once "$CFG->libdir/adminlib.php";
+require_once "$CFG->dirroot/user/filters/lib.php";
+
+use core_table\local\filter\filter;
+use core_table\local\filter\integer_filter;
+use core_table\local\filter\string_filter;
+
+
+define('DEFAULT_PAGE_SIZE', 20);
+define('SHOW_ALL_PAGE_SIZE', 5000);
+
+
 class gerautog_email_form extends moodleform {
 
     public function definition() {
-        global $COURSE;
+        global $CFG;
+        global $DB;
+
+        $id = required_param('id', PARAM_INT);
+
+        $cm = get_coursemodule_from_id('gerautog', $id);
+        $idcourse = $cm->course;
+
+        $course = $DB->get_record('course', array('id' => $idcourse), '*', MUST_EXIST);
+
+        $COURSE = $course;
+
+        $context = context_module::instance($cm->id);
 
         $mform = $this->_form;
 
@@ -43,7 +76,6 @@ class gerautog_email_form extends moodleform {
         // Email to...
         $mform->addElement('text', 'emailto', get_string('emailto', 'mod_gerautog'), array('size' => '40', 'maxsize' => '200'));
         $mform->setType('emailto', PARAM_TEXT);
-        //$mform->addRule('emailto', null, 'required', null, 'client');
         $mform->addHelpButton('emailto', 'emailto', 'mod_gerautog');
 
         // Textarea for message to the reader.
@@ -52,11 +84,11 @@ class gerautog_email_form extends moodleform {
 
         // Get autograph image
         $mform->addElement('filemanager', 'autog', get_string('autog_book', 'mod_gerautog'), null, $this->get_filemanager_options_array());
-        //$mform->addRule('autog', null, 'required', null, 'client');
         $mform->addHelpButton('autog', 'autog_book', 'mod_gerautog');
-        //var_dump($mform);
+
         // Add submit and cancel buttons.
         $this->add_action_buttons(false, get_string('generatebook', 'mod_gerautog'));
+
     }
 
     public function data_preprocessing(&$data) {
@@ -92,7 +124,6 @@ class gerautog_email_form extends moodleform {
         $usercontext = context_user::instance($USER->id);
         $fs = get_file_storage();
         $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $draftitemid, 'id', false);
-        //var_dump($files);
         return (count($files) > 0);
     }
 

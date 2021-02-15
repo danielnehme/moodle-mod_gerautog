@@ -18,15 +18,15 @@
  * Plugin version and other meta-data are defined here.
  *
  * @package     mod_gerautog
- * @copyright   2020 Nasnuv <tecnologia@nasnuv.com.br>
+ * @copyright   2020-2021 Nasnuv <tecnologia@nasnuv.com.br>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_gerautog';
-$plugin->release = '0.2.0';
-$plugin->version = 2020091404;
+$plugin->release = '0.2.3';
+$plugin->version = 2021020601;
 $plugin->requires = 2019111800;
 // MATURITY_ALPHA, MATURITY_BETA, MATURITY_RC, MATURITY_STABLE.
 $plugin->maturity = MATURITY_BETA;
